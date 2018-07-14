@@ -32,40 +32,43 @@ $(document).ready(function() {
 
     database.ref().on('child_added', function(snapShot) {
         var sv = snapShot.val();
-        var arrivalTime = moment.unix(sv.arrivalTime);
-        var minutesAway = undefined;
+        if(!sv.trainTime.match(/Invalid date/i)){
+            var arrivalTime = moment.unix(sv.arrivalTime);
+            var minutesAway = undefined;
 
-        console.log("Next Arrival Time: " + arrivalTime.format('hh:mm A'));
-        
-        while(arrivalTime.diff(moment(),'m') <= 0) 
-        {
-            console.log('adding time...');
-            arrivalTime.add(sv.frequencyTime,'m');
+            console.log("Next Arrival Time: " + arrivalTime.format('hh:mm A'));
+            var _currentTime = moment();
+            console.log(arrivalTime.diff(_currentTime,'m') <= 0);
+            while(arrivalTime.diff(_currentTime,'m') <= 0) 
+            {
+                console.log('adding time...');
+                arrivalTime.add(sv.frequencyTime,'m');
+            }
+
+            minutesAway = arrivalTime.diff(moment(),'m');
+
+            // console.log("SnapShot Name: " + sv.name);
+            // console.log("SnapShot Destination: " + sv.destinationName);
+            // console.log("SnapShot Train Time: " + sv.trainTime);
+            console.log("SnapShot Frequency: " + sv.frequencyTime);
+            // console.log("Next Arrival Time: " + arrivalTime.format('hh:mm A'));
+            console.log("Minutes Away: " + minutesAway);
+
+            var tbodyElem = $('#train-records');
+            var trElem = $('<tr>');
+            var tdName = $('<td>').addClass('train-name').append(sv.name);
+            var tdDestination = $('<td>').addClass('destination').append(sv.destinationName);
+            var tdFrequency = $('<td>').addClass('frequency').append(sv.frequencyTime);
+            var tdNextArrival = $('<td>').addClass('next-arrival').append(arrivalTime.format('hh:mm A'));
+            var tdMinutesAway = $('<td>').addClass('minutes-away').append(minutesAway);
+
+            trElem.append(tdName);
+            trElem.append(tdDestination);
+            trElem.append(tdFrequency);
+            trElem.append(tdNextArrival);
+            trElem.append(tdMinutesAway);
+
+            tbodyElem.append(trElem);
         }
-
-        minutesAway = arrivalTime.diff(moment(),'m');
-
-        console.log("SnapShot Name: " + sv.name);
-        console.log("SnapShot Destination: " + sv.destinationName);
-        console.log("SnapShot Train Time: " + sv.trainTime);
-        console.log("SnapShot Frequency: " + sv.frequencyTime);
-        console.log("Next Arrival Time: " + arrivalTime.format('hh:mm A'));
-        console.log("Minutes Away: " + minutesAway);
-
-        var tbodyElem = $('#train-records');
-        var trElem = $('<tr>');
-        var tdName = $('<td>').addClass('train-name').append(sv.name);
-        var tdDestination = $('<td>').addClass('destination').append(sv.destinationName);
-        var tdFrequency = $('<td>').addClass('frequency').append(sv.frequencyTime);
-        var tdNextArrival = $('<td>').addClass('next-arrival').append(arrivalTime.format('hh:mm A'));
-        var tdMinutesAway = $('<td>').addClass('minutes-away').append(minutesAway);
-
-        trElem.append(tdName);
-        trElem.append(tdDestination);
-        trElem.append(tdFrequency);
-        trElem.append(tdNextArrival);
-        trElem.append(tdMinutesAway);
-
-        tbodyElem.append(trElem);
     })
 });
